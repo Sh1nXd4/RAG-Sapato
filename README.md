@@ -54,9 +54,9 @@
 
 ### 4. Definição dos Papéis Scrum
 - **Product Owner (PO):** Edgar Moiti Inoki Yabiku
-- **Scrum Master (SM):** Diogo Confortini De Oliveira *(sugestão)*
+- **Scrum Master (SM):** Luís Teixeira
 - **Development Team (Time de Engenharia de Dados e Backend):** Graziano, João Henrique, João Pedro, Larissa.
-- **Development Team (Time de Ciência de Dados e IA):** Luís Teixeira, Mayara, Vítor, Gustavo.
+- **Development Team (Time de Ciência de Dados e IA):** Diogo Confortini De Oliveira, Mayara, Vítor, Gustavo.
 
 ---
 
