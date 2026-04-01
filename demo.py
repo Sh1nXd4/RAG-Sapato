@@ -2,6 +2,12 @@ import mlflow
 import mlflow.sklearn
 from sklearn.linear_model import LinearRegression
 from sklearn.datasets import make_regression
+import os
+
+# Configure S3/MinIO credentials
+os.environ["AWS_ACCESS_KEY_ID"] = "minio"
+os.environ["AWS_SECRET_ACCESS_KEY"] = "minio123"
+os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://localhost:9000"
 
 mlflow.set_tracking_uri("http://localhost:3000")
 mlflow.set_experiment("meu_experimento_1")
