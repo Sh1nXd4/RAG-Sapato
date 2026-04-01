@@ -1,22 +1,27 @@
 import pandas as pd
 import os
 
-# 1. Criar a estrutura de pastas simulando os Buckets (Data Lake)
-pastas = ['bronze', 'silver', 'gold']
-for pasta in pastas:
-    os.makedirs(pasta, exist_ok=True)
-    print(f"Pasta '{pasta}' verificada/criada.")
+# --- CREDENCIAIS DO MINIO ---
+credenciais_minio = {
+    "key": "minio",
+    "secret": "minio123",
+    "client_kwargs": {
+        "endpoint_url": "http://localhost:9000"
+    }
+}
 
-print("\nIniciando Pipeline de Ingestão...")
+print("Iniciando Pipeline de Ingestão direto para o MinIO...")
 
 # ==========================================
 # CAMADA BRONZE (Raw Data - Dados Brutos)
 # ==========================================
 print("Processando Camada Bronze...")
-# Lê o CSV original
+# Lê o CSV original que está na sua pasta
 df_raw = pd.read_csv('food_coded.csv')
-# Salva exatamente como chegou, garantindo o histórico
-df_raw.to_csv('bronze/food_coded_raw.csv', index=False)
+
+# Salva exatamente como chegou direto no bucket 'bronze' do MinIO
+df_raw.to_csv('s3://bronze/food_coded_raw.csv', index=False, storage_options=credenciais_minio)
+print("✓ Dados salvos no bucket Bronze!")
 
 
 # ==========================================
@@ -40,8 +45,9 @@ df_silver['fav_cuisine'] = df_silver['fav_cuisine'].fillna('Nao Informado')
 # Regra 4: Padronizar nomes das colunas para minúsculo (boa prática)
 df_silver.columns = [col.lower() for col in df_silver.columns]
 
-# Salva em formato Parquet (mais leve e rápido para analytics)
-df_silver.to_parquet('silver/food_coded_cleaned.parquet', index=False)
+# Salva em formato Parquet no bucket 'silver' do MinIO
+df_silver.to_parquet('s3://silver/food_coded_cleaned.parquet', index=False, storage_options=credenciais_minio)
+print("✓ Dados salvos no bucket Silver!")
 
 
 # ==========================================
@@ -59,8 +65,9 @@ df_gold_genero = df_silver.groupby('gender').agg(
 df_gold_esportes = df_silver[df_silver['sports'] == 1].groupby('comfort_food').size().reset_index(name='contagem')
 df_gold_esportes = df_gold_esportes.sort_values(by='contagem', ascending=False).head(10)
 
-# Salva as tabelas agregadas prontas para o BI/Dashboard
-df_gold_genero.to_parquet('gold/metricas_por_genero.parquet', index=False)
-df_gold_esportes.to_parquet('gold/top_comfort_food_esportistas.parquet', index=False)
+# Salva as tabelas agregadas no bucket 'gold' do MinIO
+df_gold_genero.to_parquet('s3://gold/metricas_por_genero.parquet', index=False, storage_options=credenciais_minio)
+df_gold_esportes.to_parquet('s3://gold/top_comfort_food_esportistas.parquet', index=False, storage_options=credenciais_minio)
+print("✓ Dados salvos no bucket Gold!")
 
-print("\nPipeline concluído com sucesso! Verifique as pastas bronze, silver e gold.")
+print("\nPipeline concluído com sucesso! Os dados foram enviados para o Data Lake no MinIO.")
