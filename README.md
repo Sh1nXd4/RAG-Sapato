@@ -17,7 +17,7 @@
 
 ### Dataset (Fonte)
 - https://www.kaggle.com/code/ritesaluja/food-restaurants/input?select=food_coded.csv
-
+- https://huggingface.co/datasets/JesseFWarrenV/Yelp-Restaurants/viewer/default/train?p=1503
 ### Project Owner
 - Edgar Moiti Inoki Yabiku
 

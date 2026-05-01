@@ -1,0 +1,25 @@
+# Ambiente virtual
+.venv/
+venv/
+
+# Cache Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Dados grandes / gerados
+bronze/*.csv
+bronze/*.parquet
+silver/*.csv
+silver/*.parquet
+gold/*.csv
+gold/*.parquet
+
+# MLflow
+mlruns/
+mlflow.db
+
+# Modelos gerados
+*.pkl
+*.joblib
+*.h5
