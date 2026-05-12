@@ -60,7 +60,7 @@ def process_gold():
     diretorio_atual = os.path.dirname(os.path.abspath(__file__))
     diretorio_raiz = os.path.dirname(diretorio_atual)
 
-    caminho_silver = os.path.join(diretorio_raiz, 'silver', 'silver_data.parquet')
+    caminho_silver = os.path.join(diretorio_raiz, '2. silver', 'silver_data.parquet')
 
     print(f"Lendo dados de: {caminho_silver}")
     df = pd.read_parquet(caminho_silver)

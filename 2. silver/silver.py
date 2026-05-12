@@ -66,7 +66,7 @@ def process_silver():
     diretorio_atual = os.path.dirname(os.path.abspath(__file__))
     diretorio_raiz = os.path.dirname(diretorio_atual)
     
-    caminho_bronze = os.path.join(diretorio_raiz, 'bronze', 'restaurants_with_embeddings.csv')      
+    caminho_bronze = os.path.join(diretorio_raiz, '1. bronze', 'restaurants_with_embeddings.csv')      
     print(f"Lendo dados de: {caminho_bronze}")
     
     df = pd.read_csv(caminho_bronze)

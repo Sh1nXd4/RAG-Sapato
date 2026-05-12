@@ -3,6 +3,26 @@ import numpy as np
 import mlflow
 import mlflow.sklearn
 
+
+
+# Minio
+credenciais_minio = {
+    "key": "minio",
+    "secret": "minio123",
+    "client_kwargs": {
+        "endpoint_url": "http://localhost:9000"
+    }
+}
+
+
+# para matriz de confusão
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+import matplotlib.pyplot as plt
+plt.switch_backend('TkAgg')  # Abre janela
+
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
@@ -17,9 +37,7 @@ from collections import Counter
 mlflow.set_experiment("Foodhunter_Classification")
 
 
-# =========================================
 #  FUNÇÃO DE AVALIAÇÃO
-# =========================================
 def avaliar(nome, y_test, pred):
     acc = accuracy_score(y_test, pred)
     prec = precision_score(y_test, pred, zero_division=0)
@@ -34,31 +52,42 @@ def avaliar(nome, y_test, pred):
     print(f"F1-score : {f1:.4f}")
     print("="*50)
 
+    #matriz de confusão
+    matriz = confusion_matrix(y_test, pred)
+
+    print("\n Matriz de Confusão:")
+    print(matriz)
+
+    
+    plt.figure()
+    sns.heatmap(matriz, annot=True, fmt='d', cmap='Blues')
+    plt.title(f"Matriz de Confusão - {nome}")
+    plt.xlabel("Previsto")
+    plt.ylabel("Real")
+    plt.show()
+
     return acc, prec, rec, f1
 
 
-# =========================================
+
 #  PIPELINE PRINCIPAL
-# =========================================
 def train_models():
 
     print("\n INICIANDO TREINAMENTO...\n")
 
-    df = pd.read_parquet('gold/gold_data.parquet')
+    df = pd.read_parquet('s3://gold/gold_data.parquet',storage_options=credenciais_minio)
 
     print(f" Registros: {len(df)}")
 
-    # =========================================
-    #  TARGET (SEM DATA LEAKAGE)
-    # =========================================
+
+    #  Coluna Alvo 
     df['is_recommended'] = (df['stars'] >= 3.5).astype(int)
 
     print("\n Distribuição:")
     print(df['is_recommended'].value_counts(normalize=True))
 
-    # =========================================
+
     #  FEATURES
-    # =========================================
     features_base = [
         'review_count',
         'price_range',
@@ -71,9 +100,8 @@ def train_models():
     df['has_delivery'] = df['has_delivery'].astype(int)
     df['has_outdoor'] = df['has_outdoor'].astype(int)
 
-    # =========================================
+
     #  CATEGORIAS (REDUZIDAS)
-    # =========================================
     print("\n Processando categorias...")
 
     all_categories = [cat for sublist in df['categories_list'] for cat in sublist]
@@ -97,15 +125,13 @@ def train_models():
 
     print(f" Categorias usadas: {len(mlb.classes_)}")
 
-    # =========================================
+    
     # DATASET FINAL
-    # =========================================
     X = pd.concat([df[features_base], df_categories], axis=1)
     y = df['is_recommended']
 
-    # =========================================
-    # SPLIT
-    # =========================================
+
+    # DIVISÃO TREINO E TESTE
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
